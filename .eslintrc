@@ -1,0 +1,7 @@
+{
+    "extends": "plugin:@-k/base",
+    "plugins": ["@-k"],
+    "rules": {
+        "no-unused-vars": "warn" // while in building
+    }
+}

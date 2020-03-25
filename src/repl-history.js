@@ -1,7 +1,6 @@
-'use strict';
+const injectHistoryIntoRepl = (repl, historyFile) => {
+  const magic = 'lol';
+  return magic;
+};
 
-module.exports = replHistory;
-
-function replHistory() {
-    // TODO
-}
+module.exports = injectHistoryIntoRepl;

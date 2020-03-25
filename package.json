@@ -18,9 +18,23 @@
     "url": "git+https://github.com/omni-tools/repl-history.git"
   },
   "scripts": {
-    "test": "echo \"Error: run tests from root\" && exit 1"
+    "lint": "eslint src test ${flag}",
+    "test:unit": "ava",
+    "test": "npm run lint && nyc npm run test:unit"
   },
   "bugs": {
     "url": "https://github.com/omni-tools/repl-history/issues"
+  },
+  "devDependencies": {
+    "@-k/eslint-plugin": "^0.3.1",
+    "ava": "^2.4.0",
+    "codecov": "^3.6.5",
+    "eslint": "^6.8.0",
+    "nyc": "^15.0.0"
+  },
+  "ava": {
+    "files": [
+      "test/**/*.test.js"
+    ]
   }
 }

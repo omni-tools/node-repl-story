@@ -1,7 +1,7 @@
-'use strict';
+const test = require('ava');
 
 const replHistory = require('..');
 
-describe('repl-history', () => {
-    it('needs tests');
+test('I can load it', t => {
+  t.is(typeof replHistory, 'function');
 });
