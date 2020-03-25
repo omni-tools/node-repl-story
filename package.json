@@ -1,0 +1,26 @@
+{
+  "name": "repl-history",
+  "version": "0.0.1",
+  "description": "Load history into node repl",
+  "keywords": [
+    "repl",
+    "history"
+  ],
+  "author": "AdrieanKhisbe <adriean.khisbe@live.fr>",
+  "homepage": "https://github.com/omni-tools/repl-history#readme",
+  "license": "MIT",
+  "main": "src/repl-history.js",
+  "files": [
+    "src"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/omni-tools/repl-history.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/omni-tools/repl-history/issues"
+  }
+}
