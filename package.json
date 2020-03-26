@@ -21,7 +21,8 @@
     "start": "node test/try.js",
     "lint": "eslint src test ${flag}",
     "test:unit": "ava",
-    "test": "npm run lint && nyc npm run test:unit"
+    "test": "npm run lint && nyc npm run test:unit",
+    "publish-coverage": "codecov"
   },
   "bugs": {
     "url": "https://github.com/omni-tools/repl-history/issues"
