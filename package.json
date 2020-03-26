@@ -1,21 +1,22 @@
 {
-  "name": "repl-history",
+  "name": "repl-story",
   "version": "0.0.1",
   "description": "Load history into node repl",
   "keywords": [
     "repl",
-    "history"
+    "history",
+    "story"
   ],
   "author": "AdrieanKhisbe <adriean.khisbe@live.fr>",
-  "homepage": "https://github.com/omni-tools/repl-history#readme",
+  "homepage": "https://github.com/omni-tools/node-repl-story#readme",
   "license": "MIT",
-  "main": "src/repl-history.js",
+  "main": "src/repl-story.js",
   "files": [
     "src"
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/omni-tools/repl-history.git"
+    "url": "git+https://github.com/omni-tools/node-repl-story.git"
   },
   "scripts": {
     "start": "node test/try.js",
@@ -25,7 +26,7 @@
     "publish-coverage": "codecov"
   },
   "bugs": {
-    "url": "https://github.com/omni-tools/repl-history/issues"
+    "url": "https://github.com/omni-tools/node-repl-story/issues"
   },
   "devDependencies": {
     "@-k/eslint-plugin": "^0.3.1",
