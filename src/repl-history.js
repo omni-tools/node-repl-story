@@ -1,11 +1,12 @@
 const {REPLServer} = require('repl');
 const fs = require('fs');
 
-const BASIC_WHITELIST = ['.history']; // TODO: make it extendable! (ignore)
+const BASIC_WHITELIST = ['.history'];
 
 const setUpHistory = (replServer, filename, options = {}) => {
   loadHistoryIntoReplServer(replServer, filename, options);
-  setUpHistoryRecording(replServer, filename, options); // todo: make it optional (noRecord)
+
+  if (!options.noRecord) setUpHistoryRecording(replServer, filename, options);
 
   replServer.commands.history = {
     help: 'Show the history',
@@ -20,14 +21,13 @@ const setUpHistory = (replServer, filename, options = {}) => {
   return replServer;
 };
 const loadHistoryIntoReplServer = (replServer, filename, options) => {
-  // MAYBE: filter on load? (_.uniq?)
+  // MAYBE: filter on load? (_.uniq?), and apply ignore filter?
   const history = fs
     .readFileSync(filename)
     .toString()
     .split('\n')
     .reverse()
     .slice(1);
-  // MAYBE: better parsing
   replServer.history = history;
   return replServer;
 };
@@ -36,8 +36,10 @@ const setUpHistoryRecording = (replServer, filename, options) => {
   const descriptor = fs.openSync(filename, 'a');
   const scribe = fs.createWriteStream(filename, {fd: descriptor});
 
+  const whitelist = BASIC_WHITELIST.concat(options.ignore || []);
+
   replServer.on('line', cmd => {
-    if (cmd && !BASIC_WHITELIST.includes(cmd)) {
+    if (cmd && !whitelist.includes(cmd)) {
       scribe.write(`${cmd}\n`);
     } else {
       // erase item from history
@@ -57,15 +59,19 @@ const replHistory = options => {
     historyFile,
     filename = historyFile,
     prompt,
-    noCreate = false
+    noCreate = false,
+    create = !noCreate,
+    noRecord = false,
+    record = !noRecord,
+    ignore
   } = options || {};
-  if (!noCreate && !fs.existsSync(filename)) fs.writeFileSync(filename, '');
+  if (create && !fs.existsSync(filename)) fs.writeFileSync(filename, '');
 
-  // MAYBE: read only mode, injectable values
-  if (repl instanceof REPLServer) return setUpHistory(repl, filename);
+  const replInstance = repl instanceof REPLServer ? repl : repl.start(prompt);
 
-  return setUpHistory(repl.start(prompt), filename);
+  return setUpHistory(replInstance, filename, {record, ignore});
 };
 
 module.exports = replHistory;
+module.exports.replHistory;
 module.exports.loadHistoryIntoReplServer;

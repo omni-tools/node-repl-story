@@ -18,6 +18,7 @@
     "url": "git+https://github.com/omni-tools/repl-history.git"
   },
   "scripts": {
+    "start": "node test/try.js",
     "lint": "eslint src test ${flag}",
     "test:unit": "ava",
     "test": "npm run lint && nyc npm run test:unit"
@@ -30,7 +31,8 @@
     "ava": "^2.4.0",
     "codecov": "^3.6.5",
     "eslint": "^6.8.0",
-    "nyc": "^15.0.0"
+    "nyc": "^15.0.0",
+    "yargs": "^15.3.1"
   },
   "ava": {
     "files": [
