@@ -17,7 +17,7 @@ const loadHistoryIntoReplServer = (replServer, filename) => {
     .split('\n')
     .reverse()
     .slice(1);
-  // TODO: better parsing
+  // MAYBE: better parsing
   replServer.history = history;
   return replServer;
 };
@@ -41,9 +41,16 @@ const setUpHistoryRecording = (replServer, filename) => {
 };
 
 const replHistory = options => {
-  const {replServer, repl = replServer, historyFile, filename = historyFile, prompt} =
-    options || {};
-  // TODO: check historyFile exists
+  const {
+    replServer,
+    repl = replServer,
+    historyFile,
+    filename = historyFile,
+    prompt,
+    noCreate = false
+  } = options || {};
+  if (!noCreate && !fs.existsSync(filename)) fs.writeFileSync(filename, '');
+
   // MAYBE: read only mode, injectable values
   if (repl instanceof REPLServer) return setUpHistory(repl, filename);
 
