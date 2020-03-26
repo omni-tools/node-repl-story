@@ -1,16 +1,26 @@
 const {REPLServer} = require('repl');
 const fs = require('fs');
 
-const BASIC_WHITELIST = []; // TODO: make it configurable!
+const BASIC_WHITELIST = ['.history']; // TODO: make it extendable! (ignore)
 
-const setUpHistory = (replServer, filename) => {
-  loadHistoryIntoReplServer(replServer, filename);
-  setUpHistoryRecording(replServer, filename); // todo: make it optional
+const setUpHistory = (replServer, filename, options = {}) => {
+  loadHistoryIntoReplServer(replServer, filename, options);
+  setUpHistoryRecording(replServer, filename, options); // todo: make it optional (noRecord)
 
-  // TODO: commands and more!
+  replServer.commands.history = {
+    help: 'Show the history',
+    action() {
+      replServer.history.map(historyItem => {
+        replServer.outputStream.write(historyItem);
+        replServer.outputStream.write('\n');
+      });
+      replServer.displayPrompt();
+    }
+  };
   return replServer;
 };
-const loadHistoryIntoReplServer = (replServer, filename) => {
+const loadHistoryIntoReplServer = (replServer, filename, options) => {
+  // MAYBE: filter on load? (_.uniq?)
   const history = fs
     .readFileSync(filename)
     .toString()
@@ -22,7 +32,7 @@ const loadHistoryIntoReplServer = (replServer, filename) => {
   return replServer;
 };
 
-const setUpHistoryRecording = (replServer, filename) => {
+const setUpHistoryRecording = (replServer, filename, options) => {
   const descriptor = fs.openSync(filename, 'a');
   const scribe = fs.createWriteStream(filename, {fd: descriptor});
 
