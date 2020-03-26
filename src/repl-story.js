@@ -1,5 +1,6 @@
 const {REPLServer} = require('repl');
 const fs = require('fs');
+const os = require('os');
 
 const BASIC_WHITELIST = ['.history'];
 
@@ -65,13 +66,18 @@ const replHistory = options => {
     record = !noRecord,
     ignore
   } = options || {};
-  if (create && !fs.existsSync(filename)) fs.writeFileSync(filename, '');
+  if (!repl) throw new Error('You need to provide repl or replServer');
+  if (!filename) throw new Error('You need to provide filename or historyFile');
+
+  const resolvedFilename = filename.replace(/^~/, os.homedir);
+  if (create && !fs.existsSync(resolvedFilename)) fs.writeFileSync(resolvedFilename, '');
 
   const replInstance = repl instanceof REPLServer ? repl : repl.start(prompt);
 
-  return setUpHistory(replInstance, filename, {record, ignore});
+  return setUpHistory(replInstance, resolvedFilename, {record, ignore});
 };
 
 module.exports = replHistory;
-module.exports.replHistory;
+module.exports.replStory = replHistory;
+module.exports.replHistory = replHistory;
 module.exports.loadHistoryIntoReplServer;
