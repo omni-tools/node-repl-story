@@ -4,10 +4,10 @@ const os = require('os');
 
 const BASIC_WHITELIST = ['.history'];
 
-const setUpHistory = (replServer, filename, options = {}) => {
+const setUpHistory = (replServer, filename, options) => {
   loadHistoryIntoReplServer(replServer, filename, options);
 
-  if (!options.noRecord) setUpHistoryRecording(replServer, filename, options);
+  if (options.record) setUpHistoryRecording(replServer, filename, options);
 
   replServer.defineCommand('history', {
     help: 'Show the history',
@@ -74,7 +74,10 @@ const replHistory = options => {
     throw new Error('Unexpected repl/replServer provided');
 
   const resolvedFilename = filename.replace(/^~/, os.homedir);
-  if (create && !fs.existsSync(resolvedFilename)) fs.writeFileSync(resolvedFilename, '');
+  if (!fs.existsSync(resolvedFilename)) {
+    if (!create) throw new Error(`Provided filename does not exists and create is disabled`);
+    fs.writeFileSync(resolvedFilename, '');
+  }
 
   // Note, passing options enable to forward all options to repl.start
   const replInstance = repl instanceof REPL.REPLServer ? repl : repl.start(options);

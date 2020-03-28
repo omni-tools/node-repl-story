@@ -3,9 +3,9 @@ const {PassThrough, Writable} = require('stream');
 const fs = require('fs');
 const path = require('path');
 const test = require('ava');
-const replHistory = require('..');
+const replHistory = require('../src/repl-story');
 
-const TMP_FOLDER = path.join(__dirname, '..', 'tmp');
+const TMP_FOLDER = path.join(__dirname, '..', 'tmp', String(process.pid));
 const makeHistoryFilename = () => path.join(TMP_FOLDER, `.history-file.${Date.now()}`);
 
 const getReplInputStream = () => new PassThrough();
@@ -44,8 +44,10 @@ const filterOutput = (outputChuncks, prompt = '> ') =>
   outputChuncks.filter(chunck => ![prompt, '\n'].includes(chunck));
 
 test.before(() => {
-  if (!fs.existsSync(TMP_FOLDER)) {
-    fs.mkdirSync(TMP_FOLDER);
+  for (const folder of [path.dirname(TMP_FOLDER), TMP_FOLDER]) {
+    if (!fs.existsSync(folder)) {
+      fs.mkdirSync(folder);
+    }
   }
 });
 
@@ -76,6 +78,17 @@ test('correctly wrap a repl', async t => {
   const wrapRepl = replHistory({repl, filename});
   t.is(wrapRepl, repl, 'Different repl was returned!');
   await wrapRepl.cleanClose();
+});
+
+test('should crash if file does not exist and no create option', async t => {
+  const repl = getRepl();
+  t.throws(() => replHistory({repl, filename: '~/T/H/I/S/not/Exist/Okay', create: false}), {
+    message: `Provided filename does not exists and create is disabled`
+  });
+  t.throws(
+    () => replHistory({repl, filename: '~/We/do/not/want/to/goto/Tataouine', noCreate: true}), // considered evil
+    {message: `Provided filename does not exists and create is disabled`}
+  );
 });
 
 test('enable writing to repl, and have history preserved', async t => {
@@ -123,4 +136,33 @@ test('supports history loading and access via command', async t => {
   const outputItems = filterOutput(wrapRepl.capturedOutput);
   t.deepEqual([...outputItems].reverse(), historyItems);
   await wrapRepl.cleanClose();
+});
+
+test('enable writing to repl, but no history preserved', async t => {
+  const repl = getRepl();
+  const filename = makeHistoryFilename();
+  const historyItems = ['1+1', '2', "'makes four'"];
+  fs.writeFileSync(filename, historyItems.concat(['']).join('\n'));
+  const wrapRepl = replHistory({repl, filename, record: false});
+
+  wrapRepl.inputStream.write('.history\n');
+  t.deepEqual(repl.outputStream.captureBuffer, [
+    '> ',
+    ...historyItems
+      .map(i => [`${i}`, '\n'])
+      .reverse()
+      .flat(),
+    '> '
+  ]);
+  wrapRepl.inputStream.write("'say something cool but secrete\n");
+  wrapRepl.inputStream.write("'something cool but secrete'\n");
+  t.is(wrapRepl.last, 'something cool but secrete');
+  await wrapRepl.cleanClose();
+
+  const historyContent = fs
+    .readFileSync(filename)
+    .toString()
+    .split('\n')
+    .filter(line => line.length);
+  t.deepEqual(historyContent, historyItems, 'History didnt stayed the same');
 });
