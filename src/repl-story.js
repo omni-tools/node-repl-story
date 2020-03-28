@@ -51,15 +51,16 @@ const setUpHistoryRecording = (replServer, filename, options) => {
   replServer.on('exit', () => fs.closeSync(descriptor));
 };
 
-const replHistory = options => {
-  if (!options)
+const replHistory = (...args) => {
+  if (args.length === 0)
     throw new Error('Missing options. Provide either an historyFile path or a config object');
-  if (typeof options === 'string') options = {filename: options};
+  const [standaloneFilename, options = {}] =
+    args.length === 1 ? (typeof args[0] === 'string' ? [args[0]] : [null, args[0]]) : args;
 
   const {
-    replServer = REPL, // FIXME: check
+    replServer = REPL,
     repl = replServer,
-    historyFile,
+    historyFile = standaloneFilename,
     filename = historyFile,
     noCreate = false,
     create = !noCreate,

@@ -124,6 +124,18 @@ test('correctly set up instantiating a repl', async t => {
   repl.close();
 });
 
+test('correctly set up instantiating a repl [file+option signature]', async t => {
+  const filename = makeHistoryFilename();
+  const captureBuffer = [];
+  const input = getReplInputStream();
+  const output = getReplOutpuStream(captureBuffer);
+  // output and input are forwared to repl.start()
+  const repl = replHistory(filename, {input, output, prompt: ':: '});
+  repl.inputStream.write("'Self instantiating repl'\n");
+  t.deepEqual(repl.outputStream.captureBuffer, [':: ', "'Self instantiating repl'\n", ':: ']);
+  repl.close();
+});
+
 test('supports history loading and access via command', async t => {
   const repl = getRepl();
   const filename = makeHistoryFilename();
