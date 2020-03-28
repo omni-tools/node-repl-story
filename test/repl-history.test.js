@@ -8,16 +8,25 @@ const replHistory = require('..');
 const TMP_FOLDER = path.join(__dirname, '..', 'tmp');
 const makeHistoryFilename = () => path.join(TMP_FOLDER, `.history-file.${Date.now()}`);
 
+const getReplInputStream = () => new PassThrough();
+const getReplOutpuStream = captureBuffer =>
+  Object.assign(
+    new Writable({
+      captureBuffer,
+      write(chunck, encoding, cb) {
+        captureBuffer.push(chunck.toString());
+        cb();
+      }
+    }),
+    {captureBuffer}
+  );
+
 const getRepl = () => {
   const capturedOutput = [];
-  const outputStream = new Writable({
-    write(chunck, encoding, cb) {
-      capturedOutput.push(chunck.toString());
-      cb();
-    }
+  const replServer = REPL.start({
+    input: getReplInputStream(),
+    output: getReplOutpuStream(capturedOutput)
   });
-  const inputStream = new PassThrough();
-  const replServer = REPL.start({input: inputStream, output: outputStream});
 
   const cleanClose = (beforeCloseDelay = 200, afterCloseDelay = 120) => {
     return new Promise(resolve => {
@@ -47,12 +56,11 @@ test('exposed function and helpers/aliases by module', t => {
 });
 
 test('crash if missing args', t => {
-  t.throws(() => replHistory());
-  t.throws(() => replHistory({repl: 'REPL STUB'}), {
-    message: 'You need to provide filename or historyFile'
+  t.throws(() => replHistory(), {
+    message: 'Missing options. Provide either an historyFile path or a config object'
   });
-  t.throws(() => replHistory({filename: 'FILENAME STUB'}), {
-    message: 'You need to provide repl or replServer'
+  t.throws(() => replHistory({}), {
+    message: 'You need to provide filename or historyFile'
   });
 });
 
@@ -89,6 +97,18 @@ test('enable writing to repl, and have history preserved', async t => {
     .split('\n')
     .filter(line => line.length);
   t.is(historyContent.length, 4, 'Invalid number of history item recorded');
+});
+
+test('correctly set up instantiating a repl', async t => {
+  const filename = makeHistoryFilename();
+  const captureBuffer = [];
+  const input = getReplInputStream();
+  const output = getReplOutpuStream(captureBuffer);
+  // output and input are forwared to repl.start()
+  const repl = replHistory({input, output, filename, prompt: ':: '});
+  repl.inputStream.write("'Self instantiating repl'\n");
+  t.deepEqual(repl.outputStream.captureBuffer, [':: ', "'Self instantiating repl'\n", ':: ']);
+  repl.close();
 });
 
 test('supports history loading and access via command', async t => {

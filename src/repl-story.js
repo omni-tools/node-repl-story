@@ -1,4 +1,4 @@
-const {REPLServer} = require('repl');
+const REPL = require('repl');
 const fs = require('fs');
 const os = require('os');
 
@@ -48,33 +48,36 @@ const setUpHistoryRecording = (replServer, filename, options) => {
       replServer.history.pop();
     }
   });
-  replServer.on('exit', function() {
-    fs.closeSync(descriptor);
-  });
+  replServer.on('exit', () => fs.closeSync(descriptor));
 };
 
 const replHistory = options => {
+  if (!options)
+    throw new Error('Missing options. Provide either an historyFile path or a config object');
+  if (typeof options === 'string') options = {filename: options};
+
   const {
-    replServer,
+    replServer = REPL, // FIXME: check
     repl = replServer,
     historyFile,
     filename = historyFile,
-    prompt,
     noCreate = false,
     create = !noCreate,
     noRecord = false,
     record = !noRecord,
     ignore
-  } = options || {};
-  if (!repl) throw new Error('You need to provide repl or replServer');
+  } = options;
+
   if (!filename) throw new Error('You need to provide filename or historyFile');
-  if (!(repl instanceof REPLServer) && typeof repl.start !== 'function')
+
+  if (repl !== REPL && !(repl instanceof REPL.REPLServer) && typeof repl.start !== 'function')
     throw new Error('Unexpected repl/replServer provided');
 
   const resolvedFilename = filename.replace(/^~/, os.homedir);
   if (create && !fs.existsSync(resolvedFilename)) fs.writeFileSync(resolvedFilename, '');
 
-  const replInstance = repl instanceof REPLServer ? repl : repl.start(prompt);
+  // Note, passing options enable to forward all options to repl.start
+  const replInstance = repl instanceof REPL.REPLServer ? repl : repl.start(options);
 
   return setUpHistory(replInstance, resolvedFilename, {record, ignore});
 };
