@@ -161,9 +161,11 @@ test('enable writing to repl, but no history preserved', async t => {
   t.deepEqual(repl.outputStream.captureBuffer, [
     '> ',
     ...historyItems
-      .map(i => [`${i}`, '\n'])
+      // Hackish way to do a flatten in vanilla js, without .flat
+      .map(i => `${i}__FLAT__\n`)
       .reverse()
-      .flat(),
+      .join('__FLAT__')
+      .split('__FLAT__'),
     '> '
   ]);
   wrapRepl.inputStream.write("'say something cool but secrete\n");
