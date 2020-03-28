@@ -11,32 +11,57 @@
 ## Basic Usage
 
 ```js
-const repl = require('repl');
 const replHistory = require('repl-story');
 
-const filename = '~/.my.cli'
-const replServer = replHistory({repl, filename});
+const replServer = replHistory('~/.my.wonderful.cli');
 // play around in repl
 // you can consult history using command .history
 ```
 
 ## Api
 
-`replHistory(options);`
-The two mantary field of options are:
-- `replServer` or `repl`: either the `repl` module, or a `ReplServer`
-- `filename` or `historyFile`: path toward the history file
+```js
+replHistory(filename|options, [options]); //  -> REPLServer
+```
 
-Here is the other facultative options that can be provided to `replHistory`:
-- `prompt`: optional prompt to use if did not provided a `ReplServer` instance
-- `create` or `noCreate`: whether history file should be created if missing *[default: `create=true`]*
-- `record` or `noRecord`: whether new history should be recorded *[default: `record=true`]*
-- `ignore`: an array of values that should not be recorded into history
+`replHistory` takes up to two params:
+- `filename` or `historyFile`: the path toward the history file. `filename` is mandatory.
+  However you can skip it and provide it via the `options` argument as the `filename` property (you can also use the alias `historyFile`).
 
-`replHistory()` return the [`ReplServer`](https://nodejs.org/api/repl.html#repl_class_replserver) instance you provided, or otherwise the one it started.
+- a config `options` object, this one is optional, and can replace `filename` param if it contains the filename value.
+  This is a plain old js object that support the following facultative properties <!-- maybe, mention again filename in the list-->
+
+    - `replServer` or `repl`: either the `repl` module, or a `ReplServer`. *[default the `require('repl')` builtin library]*
+    - `create` or `noCreate`: whether history file should be created if missing *[default: `create=true`]*
+    - `record` or `noRecord`: whether new history should be recorded *[default: `record=true`]*
+    - `ignore`: an array of values that should not be recorded into history
+    - any other options supported by `repl.start()` if you did not provided a `ReplServer` instance, such as:
+      - `prompt`: optional prompt to use *[default `'> '`]*
+      - `input`:  Readable stream to read from *[default `'process.stdin`]*
+      - `output`:  Readable stream to write to *[default `process.stdout`]*
+      - any other [option `repl.start()` supports](https://nodejs.org/api/repl.html#repl_repl_start_options) like `eval`, `writer`, `completer`, `useColors`; `terminal` `replMode`
+
+
+`replHistory()` return the [`REPLServer`](https://nodejs.org/api/repl.html#repl_class_replserver) instance you provided, or otherwise the one it started.
+
+### 'Complex' Example
+Here is an example to illustrate how to configure `repl-story`:
+
+```js
+const repl = require('repl');
+const replHistory = require('repl-story');
+
+const replServer = replHistory({
+    repl,
+    filename: '~/.my.cli',
+    record: false, // load history but do no record it. (equivalent to 'noRecord: true')
+    noCreate: true, // disable creation if missing. (equivalent to 'create: false')
+    prompt: ':> ' // options are forwarded to repl.start() if no provided replServer
+});
+```
 
 ## Acknowledgment
 
-This is the adaptation of [repl.history](https://github.com/tmpvar/repl.history) to current node Apis.
+This started as the adaptation of [repl.history](https://github.com/tmpvar/repl.history) to current node Apis.
 
-And why story? `repl-history` was already taken :wink:
+*And why story?* `repl-history` was already taken :wink:
