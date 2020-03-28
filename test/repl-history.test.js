@@ -28,12 +28,7 @@ const getRepl = () => {
     });
   };
 
-  return Object.assign(replServer, {
-    capturedOutput,
-    outputStream,
-    inputStream,
-    cleanClose
-  });
+  return Object.assign(replServer, {capturedOutput, cleanClose});
 };
 
 const filterOutput = (outputChuncks, prompt = '> ') =>
