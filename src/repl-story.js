@@ -9,16 +9,16 @@ const setUpHistory = (replServer, filename, options = {}) => {
 
   if (!options.noRecord) setUpHistoryRecording(replServer, filename, options);
 
-  replServer.commands.history = {
+  replServer.defineCommand('history', {
     help: 'Show the history',
     action() {
-      replServer.history.map(historyItem => {
-        replServer.outputStream.write(historyItem);
-        replServer.outputStream.write('\n');
+      this.history.map(historyItem => {
+        this.outputStream.write(historyItem);
+        this.outputStream.write('\n');
       });
-      replServer.displayPrompt();
+      this.displayPrompt();
     }
-  };
+  });
   return replServer;
 };
 const loadHistoryIntoReplServer = (replServer, filename, options) => {
