@@ -48,7 +48,7 @@ const setUpHistoryRecording = (replServer, filename, options) => {
       replServer.history.pop();
     }
   });
-  process.on('exit', function() {
+  replServer.on('exit', function() {
     fs.closeSync(descriptor);
   });
 };
