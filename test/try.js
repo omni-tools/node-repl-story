@@ -5,27 +5,27 @@ const yargs = require('yargs');
 const historyPlease = require('..');
 
 const {filename, prompt, start, create, record, ignore} = yargs
-  .option('--filename', {
+  .option('filename', {
     alias: 'f',
     string: true,
     default: path.join(__dirname, '.try')
   })
-  .option('--prompt', {
+  .option('prompt', {
     alias: 'p',
     string: true
   })
-  .option('--record', {
+  .option('record', {
     alias: 'r',
     boolean: true,
     default: true
   })
-  .option('--ignore', {
+  .option('ignore', {
     alias: 'i',
     string: true,
     default: '',
     coerce: v => v.split(';')
   })
-  .option('--start', {
+  .option('start', {
     alias: 's',
     boolean: true,
     default: true

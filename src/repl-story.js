@@ -68,6 +68,8 @@ const replHistory = options => {
   } = options || {};
   if (!repl) throw new Error('You need to provide repl or replServer');
   if (!filename) throw new Error('You need to provide filename or historyFile');
+  if (!(repl instanceof REPLServer) && typeof repl.start !== 'function')
+    throw new Error('Unexpected repl/replServer provided');
 
   const resolvedFilename = filename.replace(/^~/, os.homedir);
   if (create && !fs.existsSync(resolvedFilename)) fs.writeFileSync(resolvedFilename, '');
