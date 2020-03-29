@@ -86,10 +86,18 @@ test('correctly wrap a repl', async t => {
   await wrapRepl.cleanClose();
 });
 
-test('correctly wrap a repl [file, repl signature]', async t => {
+test('correctly wrap a repl [(file, repl) signature]', async t => {
   const repl = getRepl();
   const filename = makeHistoryFilename();
   const wrapRepl = replHistory(filename, repl);
+  t.is(wrapRepl, repl, 'Different repl was returned!');
+  await wrapRepl.cleanClose();
+});
+
+test('correctly wrap a repl [(repl, file) signature] (the history.repl signature)', async t => {
+  const repl = getRepl();
+  const filename = makeHistoryFilename();
+  const wrapRepl = replHistory(repl, filename);
   t.is(wrapRepl, repl, 'Different repl was returned!');
   await wrapRepl.cleanClose();
 });

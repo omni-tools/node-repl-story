@@ -23,7 +23,8 @@ const replServer = replHistory('~/.my.wonderful.cli');
 `replHistory` supports differents signatures:
 
 ```js
-replHistory(filename, [repl|replServer]); // original signature similar to repl.history
+replHistory(repl|replServer, filename); // original signature similar to repl.history
+replHistory(filename, [repl|replServer]);
 replHistory(options);
 replHistory(filename, options);
 //  -> REPLServer

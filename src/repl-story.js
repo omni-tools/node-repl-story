@@ -64,6 +64,7 @@ const resolveOptions = args => {
 
   if (args.length === 1) return isPlainObject(args[0]) ? [undefined, args[0]] : [args[0], {}];
 
+  if (isReplLike(args[0])) return [args[1], {repl: args[0]}]; // repl.history signature
   return isReplLike(args[1]) ? [args[0], {repl: args[1]}] : args;
 };
 
