@@ -21,7 +21,7 @@ const setUpHistory = (replServer, filename, options) => {
   });
   return replServer;
 };
-const loadHistoryIntoReplServer = (replServer, filename, options) => {
+const loadHistoryIntoReplServer = (replServer, filename) => {
   // MAYBE: filter on load? (_.uniq?), and apply ignore filter?
   const history = fs
     .readFileSync(filename)
@@ -51,11 +51,24 @@ const setUpHistoryRecording = (replServer, filename, options) => {
   replServer.on('exit', () => fs.closeSync(descriptor));
 };
 
-const replHistory = (...args) => {
+const isReplLike = repl =>
+  repl === REPL || repl instanceof REPL.REPLServer || typeof repl.start === 'function';
+
+// MAYBE: should consider lodash :smirk:
+const isPlainObject = value =>
+  value !== null && typeof value === 'object' && Object.getPrototypeOf(value) === Object.prototype;
+
+const resolveOptions = args => {
   if (args.length === 0)
     throw new Error('Missing options. Provide either an historyFile path or a config object');
-  const [standaloneFilename, options = {}] =
-    args.length === 1 ? (typeof args[0] === 'string' ? [args[0]] : [null, args[0]]) : args;
+
+  if (args.length === 1) return isPlainObject(args[0]) ? [undefined, args[0]] : [args[0], {}];
+
+  return isReplLike(args[1]) ? [args[0], {repl: args[1]}] : args;
+};
+
+const replHistory = (...args) => {
+  const [standaloneFilename, options] = resolveOptions(args);
 
   const {
     replServer = REPL,
@@ -70,9 +83,9 @@ const replHistory = (...args) => {
   } = options;
 
   if (!filename) throw new Error('You need to provide filename or historyFile');
+  if (typeof filename !== 'string') throw new Error('History filename needs to be a string');
 
-  if (repl !== REPL && !(repl instanceof REPL.REPLServer) && typeof repl.start !== 'function')
-    throw new Error('Unexpected repl/replServer provided');
+  if (!isReplLike(repl)) throw new Error('Unexpected repl/replServer provided');
 
   const resolvedFilename = filename.replace(/^~/, os.homedir);
   if (!fs.existsSync(resolvedFilename)) {
@@ -90,3 +103,4 @@ module.exports = replHistory;
 module.exports.replStory = replHistory;
 module.exports.replHistory = replHistory;
 module.exports.loadHistoryIntoReplServer;
+module.exports._utils = {isPlainObject, isReplLike};

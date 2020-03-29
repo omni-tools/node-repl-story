@@ -20,18 +20,24 @@ const replServer = replHistory('~/.my.wonderful.cli');
 
 ## Api
 
+`replHistory` supports differents signatures:
+
 ```js
-replHistory(filename|options, [options]); //  -> REPLServer
+replHistory(filename, [repl|replServer]); // original signature similar to repl.history
+replHistory(options);
+replHistory(filename, options);
+//  -> REPLServer
 ```
 
-`replHistory` takes up to two params:
-- `filename` or `historyFile`: the path toward the history file. `filename` is mandatory.
+Here are the different possible params:
+-  **`filename` or `historyFile`**: the path toward the history file. `filename` is mandatory.
   However you can skip it and provide it via the `options` argument as the `filename` property (you can also use the alias `historyFile`).
+-  **`replServer` or `repl`**: either the `repl` module, or a `ReplServer`. *[default the `require('repl')` builtin library]*
 
-- a config `options` object, this one is optional, and can replace `filename` param if it contains the filename value.
-  This is a plain old js object that support the following facultative properties <!-- maybe, mention again filename in the list-->
-
-    - `replServer` or `repl`: either the `repl` module, or a `ReplServer`. *[default the `require('repl')` builtin library]*
+-  an **`options` object**, this give you better control over `repl` and `repl-story` configuration.
+  This is a plain old js object that support the following properties
+    - **`filename` or `historyFile`**: if not provided as leading argument, you can embed the file configuration into the option object.
+    - **`replServer` or `repl`**: either the `repl` module, or a `ReplServer`. *[default the `require('repl')` builtin library]*
     - `create` or `noCreate`: whether history file should be created if missing *[default: `create=true`]*
     - `record` or `noRecord`: whether new history should be recorded *[default: `record=true`]*
     - `ignore`: an array of values that should not be recorded into history

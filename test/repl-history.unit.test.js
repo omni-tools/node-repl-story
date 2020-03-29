@@ -72,10 +72,24 @@ test('crash if no valid repl provided', t => {
   });
 });
 
+test('crash if filename provided is not a string', t => {
+  t.throws(() => replHistory(/oops not a (file)/), {
+    message: 'History filename needs to be a string'
+  });
+});
+
 test('correctly wrap a repl', async t => {
   const repl = getRepl();
   const filename = makeHistoryFilename();
   const wrapRepl = replHistory({repl, filename});
+  t.is(wrapRepl, repl, 'Different repl was returned!');
+  await wrapRepl.cleanClose();
+});
+
+test('correctly wrap a repl [file, repl signature]', async t => {
+  const repl = getRepl();
+  const filename = makeHistoryFilename();
+  const wrapRepl = replHistory(filename, repl);
   t.is(wrapRepl, repl, 'Different repl was returned!');
   await wrapRepl.cleanClose();
 });
