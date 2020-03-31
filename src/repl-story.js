@@ -39,16 +39,25 @@ const setUpHistoryRecording = (replServer, filename, options) => {
 
   const whitelist = BASIC_WHITELIST.concat(options.ignore || []);
 
+  let writing = false;
+  const close = () => {
+    if (writing) return setTimeout(close, 25);
+    fs.closeSync(descriptor);
+  };
+
   replServer.on('line', cmd => {
     if (cmd && !whitelist.includes(cmd)) {
-      scribe.write(`${cmd}\n`);
+      writing = true;
+      scribe.write(`${cmd}\n`, () => {
+        writing = false;
+      });
     } else {
       // erase item from history
       replServer.historyIndex++;
       replServer.history.pop();
     }
   });
-  replServer.on('exit', () => fs.closeSync(descriptor));
+  replServer.on('exit', close);
 };
 
 const isReplLike = repl =>
