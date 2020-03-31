@@ -55,8 +55,7 @@ const isReplLike = repl =>
   repl === REPL || repl instanceof REPL.REPLServer || typeof repl.start === 'function';
 
 // MAYBE: should consider lodash :smirk:
-const isPlainObject = value =>
-  value !== null && typeof value === 'object' && Object.getPrototypeOf(value) === Object.prototype;
+const isPlainObject = value => value != null && value.constructor.name === 'Object';
 
 const resolveOptions = args => {
   if (args.length === 0)
