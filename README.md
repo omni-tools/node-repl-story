@@ -51,6 +51,10 @@ Here are the different possible params:
 
 `replHistory()` return the [`REPLServer`](https://nodejs.org/api/repl.html#repl_class_replserver) instance you provided, or otherwise the one it started.
 
+
+**Note:** replHistory instrument the repl server so that when it closes the history file is closed properly.
+If you want for this to be complete, you can listen the `end-of-story` event on the replServer itself.
+
 ### 'Complex' Example
 Here is an example to illustrate how to configure `repl-story`:
 

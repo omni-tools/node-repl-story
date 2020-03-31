@@ -43,6 +43,7 @@ const setUpHistoryRecording = (replServer, filename, options) => {
   const close = () => {
     if (writing) return setTimeout(close, 25);
     fs.closeSync(descriptor);
+    replServer.emit('end-of-story');
   };
 
   replServer.on('line', cmd => {

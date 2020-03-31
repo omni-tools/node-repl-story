@@ -158,6 +158,30 @@ test('correctly set up instantiating a repl [file+option signature]', async t =>
   repl.close();
 });
 
+test.cb("emit a 'end-of-story' event after close, when history as been saved", t => {
+  const filename = makeHistoryFilename();
+  const captureBuffer = [];
+  const input = getReplInputStream();
+  const output = getReplOutpuStream(captureBuffer);
+  // output and input are forwared to repl.start()
+  const repl = replHistory(filename, {input, output, prompt: '>> '});
+  repl.inputStream.write("'Self instantiating repl'\n");
+  repl.inputStream.write("let History = 'being written as we speak';\n");
+  repl.close();
+  repl.on('end-of-story', () => {
+    const historyItems = fs
+      .readFileSync(filename)
+      .toString()
+      .split('\n')
+      .filter(l => l !== '');
+    t.deepEqual(historyItems, [
+      "'Self instantiating repl'",
+      "let History = 'being written as we speak';"
+    ]);
+    t.end();
+  });
+});
+
 test('supports history loading and access via command', async t => {
   const repl = getRepl();
   const filename = makeHistoryFilename();
