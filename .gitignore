@@ -2,6 +2,7 @@
 tmp
 private
 test/.try*
+.vscode
 
 # Logs
 logs
