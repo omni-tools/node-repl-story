@@ -29,7 +29,7 @@
     "url": "https://github.com/omni-tools/node-repl-story/issues"
   },
   "devDependencies": {
-    "@-k/eslint-plugin": "^0.3.1",
+    "@-k/eslint-plugin": "^0.5.0",
     "ava": "^2.4.0",
     "codecov": "^3.7.2",
     "eslint": "^6.8.0",
